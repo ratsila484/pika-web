@@ -1,0 +1,250 @@
+/*.example-spacer {
+  flex: 1 1 auto;
+}
+
+mat-toolbar {
+  box-shadow: 3px 3px 3px #33333379;
+  display: flex;
+  justify-content: center;
+}
+
+.bloc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 60%;
+}
+
+button{
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.left{
+  display: flex;
+}
+
+@media screen and (max-width: 1230px) {
+  .bloc{
+    width: 100%;
+    font-size: 16px;
+  }
+}
+
+
+
+.user mat-icon{
+  color: blue;
+  font-size: 23px;
+}
+
+.logo{
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img-logo{
+  width: 100px;
+}
+*/
+/* Styles pour la toolbar moderne */
+.modern-toolbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 64px;
+  padding: 0 24px;
+}
+
+.toolbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Section Logo */
+.logo-section {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.logo-image {
+  height: 40px;
+  width: auto;
+  filter: brightness(1.1);
+}
+
+/* Section Navigation */
+.nav-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.nav-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.nav-button mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.dropdown-button {
+  position: relative;
+}
+
+.dropdown-icon {
+  margin-left: 4px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-button[aria-expanded="true"] .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+/* Section Utilisateur */
+.user-section {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.user-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  text-transform: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.user-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.user-button mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Styles pour les menus déroulants */
+.custom-menu {
+  margin-top: 8px;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+  color: #333;
+}
+
+.menu-item:hover {
+  background: #f5f5f5;
+  color: #667eea;
+}
+
+.menu-item mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #666;
+}
+
+.menu-item:hover mat-icon {
+  color: #667eea;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-toolbar {
+    padding: 0 16px;
+  }
+
+  .nav-section {
+    gap: 8px;
+  }
+
+  .nav-button span,
+  .user-button span {
+    display: none;
+  }
+
+  .nav-button,
+  .user-button {
+    min-width: 48px;
+    padding: 8px;
+  }
+
+  .dropdown-icon {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .toolbar-container {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav-section {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    padding-top: 8px;
+  }
+}

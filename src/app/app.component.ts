@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'mon-app-nebular';
+  page:string = "";
+  menuCliked(data:string){
+    this.page = data;
+    console.log(data);
+  }
 }

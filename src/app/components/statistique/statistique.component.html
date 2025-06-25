@@ -1,0 +1,159 @@
+<div class="main d-flex justify-content-center" style="padding: 2rem">
+  <mat-card class="mat-main-card mat-elevation-z4">
+    <mat-card-header
+      class="d-flex w-100"
+      style="justify-content: space-between"
+    >
+      <h2>Statistiques</h2>
+      <div class="d-flex status-indicator" style="margin-top: 0.5rem">
+        <mat-chip-set>
+          <mat-chip>
+            <mat-icon>{{ "cloud_off" }}</mat-icon>
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="top row">
+        <div class="opt col-md-2">
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Types de Documents</mat-label>
+            <mat-select
+              [(value)]="selectedDocumentType"
+              (selectionChange)="onFilterChange()"
+            >
+              <mat-option *ngFor="let type of documentTypes" [value]="type">
+                {{ type }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="opt col-md-2">
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Activités</mat-label>
+            <mat-select
+              [(value)]="selectedActivite"
+              (selectionChange)="onFilterChange()"
+            >
+              <mat-option *ngFor="let activite of activites" [value]="activite">
+                {{ activite }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="opt col-md-2">
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Ministères</mat-label>
+            <mat-select
+              [(value)]="selectedMinistere"
+              (selectionChange)="onFilterChange()"
+            >
+              <mat-option
+                *ngFor="let ministere of ministeres"
+                [value]="ministere"
+              >
+                {{ ministere }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="opt col-md-2">
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Date</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              [(ngModel)]="selectedDate"
+              (dateChange)="onFilterChange()"
+              placeholder="Sélectionner une date"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="opt col-md-2">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="onFilterChange()"
+            class="w-100"
+          >
+            <mat-icon>refresh</mat-icon>
+            Actualiser
+          </button>
+        </div>
+      </div>
+
+      <div class="stats-summary" style="margin: 1rem 0">
+        <mat-chip-set>
+          <mat-chip color="primary">
+            <mat-icon>description</mat-icon>
+            Total: {{ getFilteredData().length }}
+          </mat-chip>
+          <mat-chip color="accent" *ngIf="selectedDocumentType !== 'Tous'">
+            <mat-icon>category</mat-icon>
+            Type: {{ selectedDocumentType }}
+          </mat-chip>
+          <mat-chip
+            color="warn"
+            *ngIf="selectedActivite && selectedActivite !== 'Tous'"
+          >
+            <mat-icon>work</mat-icon>
+            {{ selectedActivite }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <div class="chart-container" style="margin-top: 2rem">
+        <p><strong>Résultats</strong></p>
+        <canvas
+          baseChart
+          [data]="barChartData"
+          [options]="barChartOption"
+          [type]="barChartType"
+          (chartHover)="chartHovered($event)"
+          (chartClick)="chartClicked($event)"
+          style="height: 400px"
+        >
+        </canvas>
+      </div>
+
+      <div class="chart-actions" style="margin-top: 2rem; text-align: center">
+        <button
+          mat-stroked-button
+          (click)="createMinistereChart(getFilteredData())"
+          [disabled]="getFilteredData().length === 0"
+        >
+          <mat-icon>account_balance</mat-icon>
+          Par Ministère
+        </button>
+        <button
+          mat-stroked-button
+          (click)="createDateChart(getFilteredData())"
+          [disabled]="getFilteredData().length === 0"
+          style="margin-left: 1rem"
+        >
+          <mat-icon>date_range</mat-icon>
+          Par Date
+        </button>
+        <button
+          mat-stroked-button
+          (click)="updateChart()"
+          [disabled]="getFilteredData().length === 0"
+          style="margin-left: 1rem"
+        >
+          <mat-icon>bar_chart</mat-icon>
+          Vue Standard
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,235 @@
+<!--
+<div class="header d-flex">
+  <div class="left">
+    <h4 mat-dialog-title>BE - Recherche</h4>
+  </div>
+  <div class="right">
+    <mat-form-field appearance="outline">
+      <mat-label>Matricules</mat-label>
+      <input
+        type="text"
+        [(ngModel)]="searchValue"
+        (input)="filterData()"
+        matInput
+        placeholder="Ex 071207"
+      />
+    </mat-form-field>
+  </div>
+</div>
+<mat-dialog-content>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>Date</th>
+        <th>Nom</th>
+        <th>Matricule</th>
+        <th>Activité</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (ps of filteredData; track $index) {
+      <tr>
+        <td>{{ ps[1] }}</td>
+        <td>{{ formatDate(ps[6]) }}</td>
+        <td>{{ ps[4] }}</td>
+        <td>{{ ps[5] }}</td>
+        <td>{{ ps[3] }}</td>
+        <td class="dol">
+          <button (click)="download(ps[0])" mat-icon-button>
+            <mat-icon>download</mat-icon>
+          </button>
+        </td>
+      </tr>
+      }@empty {
+      <tr>
+        <td></td>
+        <td>Pas</td>
+        <td>encore</td>
+        <td>de</td>
+        <td>données</td>
+        <td></td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</mat-dialog-content>-->
+
+<div class="search-dialog">
+  <!-- Header moderne avec gradient -->
+  <div class="dialog-header">
+    <div class="header-content">
+      <div class="title-section">
+        <mat-icon class="dialog-icon">search</mat-icon>
+        <h2 mat-dialog-title class="dialog-title">Recherche de Bordereaux</h2>
+      </div>
+      <div class="search-section">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Rechercher par matricule</mat-label>
+          <input
+            type="text"
+            [(ngModel)]="searchValue"
+            (input)="filterData()"
+            matInput
+            placeholder="Ex: 071-207"
+            autocomplete="off"
+          />
+          <mat-icon matPrefix>badge</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            *ngIf="searchValue"
+            matTooltip="Effacer la recherche"
+          >
+            <mat-icon>clear</mat-icon>
+          </button>
+          <mat-hint>Tapez le matricule pour filtrer les résultats</mat-hint>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu du dialogue -->
+  <mat-dialog-content class="dialog-content">
+    <!-- Statistiques de recherche -->
+    <div class="search-stats" *ngIf="filteredData.length > 0">
+      <div class="stats-card">
+        <mat-icon class="stats-icon">analytics</mat-icon>
+        <span class="stats-text">
+          {{ filteredData.length }} résultat{{
+            filteredData.length > 1 ? "s" : ""
+          }}
+          trouvé{{ filteredData.length > 1 ? "s" : "" }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Table moderne -->
+    <div class="table-container">
+      <div class="modern-table-wrapper">
+        <table class="modern-table" *ngIf="filteredData.length > 0">
+          <thead>
+            <tr class="table-header">
+              <th class="th-number">
+                <div class="header-cell">
+                  <mat-icon>numbers</mat-icon>
+                  <span>No.</span>
+                </div>
+              </th>
+              <th class="th-date">
+                <div class="header-cell">
+                  <mat-icon>calendar_today</mat-icon>
+                  <span>Date</span>
+                </div>
+              </th>
+              <th class="th-name">
+                <div class="header-cell">
+                  <mat-icon>person</mat-icon>
+                  <span>Nom</span>
+                </div>
+              </th>
+              <th class="th-matricule">
+                <div class="header-cell">
+                  <mat-icon>badge</mat-icon>
+                  <span>Matricule</span>
+                </div>
+              </th>
+              <th class="th-activity">
+                <div class="header-cell">
+                  <mat-icon>work</mat-icon>
+                  <span>Activité</span>
+                </div>
+              </th>
+              <th class="th-actions">
+                <div class="header-cell">
+                  
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ps of filteredData; track $index; let i = $index) {
+            <tr class="table-row" [class.row-even]="i % 2 === 0">
+              <td class="cell-number">
+                <div class="">{{ ps[1] }}</div>
+              </td>
+              <td class="cell-date">
+                <div class="date-content">
+                  <span>{{ formatDate(ps[6]) }}</span>
+                </div>
+              </td>
+              <td class="cell-name">
+                <div class="name-content">
+                  <span class="name-text">{{ ps[4] }}</span>
+                </div>
+              </td>
+              <td class="cell-matricule">
+                <div class="matricule-chip">
+                  {{ ps[5] }}
+                </div>
+              </td>
+              <td class="cell-activity">
+                <div class="activity-tag">
+                  <mat-icon class="activity-icon">business_center</mat-icon>
+                  <span>{{ ps[3] }}</span>
+                </div>
+              </td>
+              <td class="cell-actions" >
+                <button
+                  (click)="download(ps[0])"
+                  mat-icon-button
+                  class="download-button"
+                  matTooltip="Télécharger le document"
+                >
+                  <mat-icon>download</mat-icon>
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+
+        <!-- État vide avec design moderne -->
+        <div class="empty-state" *ngIf="filteredData.length === 0">
+          <div class="empty-content">
+            <mat-icon class="empty-icon">search_off</mat-icon>
+            <h3 class="empty-title">Aucun résultat trouvé</h3>
+            <p class="empty-description">
+              {{
+                searchValue
+                  ? 'Aucun bordereau ne correspond à votre recherche "' +
+                    searchValue +
+                    '"'
+                  : "Aucune donnée disponible pour le moment"
+              }}
+            </p>
+            <button
+              mat-stroked-button
+              color="primary"
+              class="refresh-button"
+              *ngIf="!searchValue"
+            >
+              <mat-icon>refresh</mat-icon>
+              Actualiser
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions du dialogue -->
+    <div class="dialog-actions">
+      <button
+        mat-stroked-button
+        color="accent"
+        class="action-button secondary"
+        mat-dialog-close
+      >
+        <mat-icon>close</mat-icon>
+        <span>Fermer</span>
+      </button>
+
+    </div>
+  </mat-dialog-content>
+</div>
