@@ -1,36 +1,76 @@
-import { Component, input, output, Output } from '@angular/core';
-import { EventEmitter } from 'stream';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, Inject, OnInit, output, PLATFORM_ID } from '@angular/core';
 
 @Component({
   selector: 'app-header',
   standalone: false,
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrl: './header.component.scss',
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
+  identifiant!: string;
+  user_state!: string;
+  ngOnInit(): void {
+    const tmp = this.getItem('connected_user')?.split('/');
+    if (isPlatformBrowser(this.plateformId)) {
+      if (tmp) {
+        this.identifiant = tmp[1];
+        this.user_state = tmp[2];
+      } else {
+        window.location.href = '';
+      }
+    }
+
+    console.log(this.identifiant);
+  }
+
+  constructor(@Inject(PLATFORM_ID) private plateformId: Object) {}
   page = output<string>();
-  bePage(){
-    this.page.emit("BE");
+
+  getItem(key: string): string | null {
+    if (isPlatformBrowser(this.plateformId)) {
+      return localStorage.getItem(key);
+    }
+    return null;
   }
 
-  psPage(){
-    this.page.emit("PS");
+  setItem(key: string, value: string): void {
+    if (isPlatformBrowser(this.plateformId)) {
+      localStorage.setItem(key, value);
+    }
+  }
+  bePage() {
+    this.page.emit('BE');
   }
 
-  enregPage(){
-    this.page.emit("REG");
+  psPage() {
+    this.page.emit('PS');
   }
 
-  archivePage(){
-    this.page.emit("archives");
+  enregPage() {
+    this.page.emit('REG');
   }
 
-  statPage(){
-    this.page.emit("stat");
+  archivePage() {
+    this.page.emit('archives');
   }
 
-  accueilPage(){
-    this.page.emit("accueil");
+  statPage() {
+    this.page.emit('stat');
   }
+
+  accueilPage() {
+    this.page.emit('accueil');
+  }
+
+  deconnexion() {
+    localStorage.removeItem('connected_user');
+    window.location.href = 'http://localhost:4200/login';
+  }
+
+  autorisation(){
+    this.page.emit('autorisation')
+  }
+
   
 }

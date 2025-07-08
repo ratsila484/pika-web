@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -22,6 +22,7 @@ import { BeDataComponent } from '../../bottom-sheet/dialog/be-data.component';
 import { PdfViewerComponent } from '../../dialog/pdf-viewer/pdf-viewer.component';
 import { PdfViewerEnregComponent } from '../../dialog/pdf-viewer-enreg/pdf-viewer-enreg.component';
 import { RegSearchComponent } from '../../dialog/reg-search/reg-search.component';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-enregitrement',
@@ -48,6 +49,7 @@ export class EnregitrementComponent {
     'Radiation',
     'Accident de travail et Maladie Professionnel',
     'Immatriculation',
+    'Rectif'
   ];
 
   ministeres: string[] = [
@@ -156,6 +158,7 @@ export class EnregitrementComponent {
     'Radiation',
     'ATMP',
     'IMM',
+    'Rectif'
   ];
 
   pour: string[] = ['ORD', 'Avant VISA', 'Après Visa', 'Signature'];
@@ -180,12 +183,22 @@ export class EnregitrementComponent {
   backendStatus = false;
   temp!: string;
   regData: any;
+  user!: string;
   constructor(
     private fb: FormBuilder,
     private beService: BeService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
-  ) {}
+    private dialog: MatDialog,
+    @Inject(PLATFORM_ID) private plateformId: Object
+  ) {
+    if (isPlatformBrowser(this.plateformId)) {
+      const tmp = localStorage.getItem('connected_user');
+      if (tmp) {
+        let user_tmp = tmp.split('/');
+        this.user = user_tmp[1];
+      }
+    }
+  }
 
   ngOnInit(): void {
     this.initializeForm();
@@ -257,6 +270,7 @@ export class EnregitrementComponent {
       ministere: [null, Validators.required],
       pour: [null, Validators.required],
       dispatch: [null, Validators.required],
+      dateReg: [null, Validators.required],
     });
   }
 
@@ -375,6 +389,7 @@ export class EnregitrementComponent {
       ...this.pdfForm.value,
       numero_document: this.generateNumero(),
       date_document: new Date().toLocaleDateString('fr-FR'),
+      user: this.user,
     };
 
     const numDoc = formData.numero_document;
@@ -397,6 +412,7 @@ export class EnregitrementComponent {
   }
 
   openShowPdf(pdfBlob: Blob, data: RegFormData) {
+    console.log(data);
     const dialogRef = this.dialog.open(PdfViewerEnregComponent, {
       width: '90%',
       data: {
@@ -508,6 +524,15 @@ export class EnregitrementComponent {
       if (control.errors['required']) return 'Matricule requis';
       if (control.errors['matriculeLength'])
         return 'Matricule doit contenir 6 chiffres';
+    }
+    return null;
+  }
+
+  // Nouvelle méthode pour obtenir l'erreur de date
+  getConsortDateError(index: number): string | null {
+    const control = this.consortsArray.at(index)?.get('dateReg');
+    if (control?.errors && control.touched) {
+      if (control.errors['required']) return 'Date requise';
     }
     return null;
   }

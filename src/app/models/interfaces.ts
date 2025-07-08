@@ -20,7 +20,7 @@ export interface BeFormData {
   consorts: Consort[];
   numero_document?: string;
   date_document?: string;
-  transmise?:string;
+  transmise?: string;
 }
 
 export interface BeApiRequest {
@@ -28,7 +28,7 @@ export interface BeApiRequest {
   activite: string;
   numero_document: string;
   date_document: string;
-  transmise?:string;
+  transmise?: string;
   consorts: ConsortApiFormat[];
 }
 
@@ -76,7 +76,8 @@ export type ActiviteType =
   | 'Renouvellement de contrat'
   | 'Avenant'
   | 'Radiation'
-  | 'Accident de travail et Maladie Professionnel';
+  | 'Accident de travail et Maladie Professionnel'
+  | 'Rectif';
 
 // Configuration du service
 export interface BeServiceConfig {

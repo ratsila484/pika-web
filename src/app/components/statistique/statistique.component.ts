@@ -7,6 +7,7 @@ import {
   ChartEvent,
   ChartType,
 } from 'chart.js';
+import { BeService } from '../../services/be/be.service';
 
 interface DocumentBE {
   id: string;
@@ -49,57 +50,12 @@ interface DocumentEnreg {
   styleUrl: './statistique.component.scss',
 })
 export class StatistiqueComponent {
+  documentsPS: any[] = [];
+  documentsBE: any[] = [];
+  documentsEnreg: any[] = [];
+  constructor(private beService: BeService) {}
   //exepmle de donnee
   // Données simulées basées sur vos exemples
-  documentsBE: DocumentBE[] = [
-    {
-      id: 'a6c2ea45-18ef-4e48-ba77-9f362c04b8fd',
-      numero: '25-249',
-      fichier: 'documents/be/ps25-249_.pdf',
-      activite: 'Bonification',
-      description: 'ghjghj ghgjj',
-      reference: '789456',
-      date: 'Fri, 20 Jun 2025 17:45:33 GMT',
-      ministere: 'CF ANE',
-    },
-    {
-      id: '45438b5d-9311-44d2-ac7d-1127b7d5f9b4',
-      numero: '25-250',
-      fichier: 'documents/be/ps25-250_.pdf',
-      activite: 'Formation',
-      description: 'Description formation',
-      reference: '789457',
-      date: 'Fri, 21 Jun 2025 10:30:00 GMT',
-      ministere: 'CF ANE',
-    },
-  ];
-
-  documentsPS: DocumentPS[] = [
-    {
-      id: '4c5365a6-b39e-4610-8d67-4cbfa7d4557a',
-      numero: '25-229',
-      date: 'Fri, 20 Jun 2025 08:37:59 GMT',
-      nom: 'RAKOTO',
-      reference: '456 123',
-      activite: 'Bonification',
-      description: '',
-    },
-  ];
-
-  documentsEnreg: DocumentEnreg[] = [
-    {
-      id: 'd6d73711-f9b9-4a8c-86a4-ac15a8e606c4',
-      titre: 'fhdsjkfhdsk',
-      numero: '456456',
-      ministere: 'Ministère des Forces Armées',
-      activite: 'Bonification',
-      reference: '123',
-      code: 'P008',
-      type: 'ORD',
-      date: 'Sat, 21 Jun 2025 08:35:55 GMT',
-      fichier: 'documents/reg/enreg_21_06_2025_.pdf',
-    },
-  ];
 
   // Options de filtres
   documentTypes = ['Tous', 'BE', 'PS', 'ENREG'];
@@ -151,14 +107,25 @@ export class StatistiqueComponent {
   };
 
   ngOnInit() {
-    this.initializeFilters();
-    this.updateChart();
+    this.beService.getAllPsStat().subscribe((resultPs: any) => {
+      this.beService.getAllBEStat().subscribe((resultBe: any) => {
+        this.beService.getAllRegStat().subscribe((resultReg: any) => {
+          this.documentsPS = resultPs.data;
+          this.documentsBE = resultBe.data;
+          this.documentsEnreg = resultReg.data;
+          this.initializeFilters();
+          this.updateChart();
+        });
+      });
+    });
   }
 
   initializeFilters() {
-    // Extraire toutes les activités uniques
-    const activitesBE = this.documentsBE.map((doc) => doc.activite);
+    console.log(this.documentsPS)
+    console.log(this.documentsBE)
+    console.log(this.documentsEnreg)
     const activitesPS = this.documentsPS.map((doc) => doc.activite);
+    const activitesBE = this.documentsBE.map((doc) => doc.activite);
     const activitesEnreg = this.documentsEnreg.map((doc) => doc.activite);
 
     this.activites = [
@@ -167,12 +134,11 @@ export class StatistiqueComponent {
     ];
 
     // Extraire tous les ministères uniques
-    const ministeresBE = this.documentsBE.map((doc) => doc.ministere);
     const ministeresEnreg = this.documentsEnreg.map((doc) => doc.ministere);
 
     this.ministeres = [
       'Tous',
-      ...new Set([...ministeresBE, ...ministeresEnreg]),
+      ...new Set([...ministeresEnreg]),
     ];
   }
 
@@ -201,6 +167,7 @@ export class StatistiqueComponent {
         ...allDocs,
         ...this.documentsBE.map((doc) => ({ ...doc, type: 'BE' })),
       ];
+      console.log(allDocs)
     }
     if (
       this.selectedDocumentType === 'Tous' ||
@@ -208,7 +175,7 @@ export class StatistiqueComponent {
     ) {
       allDocs = [
         ...allDocs,
-        ...this.documentsPS.map((doc) => ({ ...doc, type: 'PS' })),
+        ...this.documentsPS.map((doc: any) => ({ ...doc, type: 'PS' })),
       ];
     }
     if (
@@ -354,68 +321,4 @@ export class StatistiqueComponent {
   onSearch() {
     this.updateChart();
   }
-
-  /*@ViewChild(BaseChartDirective) chart: BaseChartDirective<'bar'> | undefined;
-  public barChartOption: ChartConfiguration<'bar'>['options'] = {
-    //We use theseempty structure as placeholders for dynamic themeing
-    scales: {
-      x: {},
-      y: {
-        min: 10,
-      },
-    },
-    plugins: {
-      legend: {
-        display: true,
-      },
-      title: {
-        align: 'end',
-      },
-    },
-  };
-  public barChartType = 'bar' as const;
-
-  public barChartData: ChartData<'bar'> = {
-    labels: ['2006', '2007', '2008', '2009', '2010', '2011', '2012'],
-    datasets: [
-      { data: [65, 59, 80, 91, 56, 55, 40], label: 'Series A' },
-      { data: [28, 48, 40, 86, 27, 90], label: 'Series B' },
-    ],
-  };
-
-  //envets
-  public chartClicked({
-    event,
-    active,
-  }: {
-    event?: ChartEvent;
-    active?: object[];
-  }): void {
-    console.log(event, active);
-  }
-
-  public chartHovered({
-    event,
-    active,
-  }: {
-    event?: ChartEvent;
-    active?: object[];
-  }): void {
-    console.log(event, active);
-  }
-
-  public randomize(): void {
-    // Only Change 3 values
-    this.barChartData.datasets[0].data = [
-      Math.round(Math.random() * 100),
-      59,
-      80,
-      Math.round(Math.random() * 100),
-      56,
-      Math.round(Math.random() * 100),
-      40,
-    ];
-
-    this.chart?.update();
-  }*/
 }

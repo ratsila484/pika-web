@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, Inject, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -14,8 +14,6 @@ import {
   MatBottomSheet,
   MatBottomSheetRef,
 } from '@angular/material/bottom-sheet';
-import { BeDataComponent } from '../../bottom-sheet/dialog/be-data.component';
-import { PdfViewerComponent } from '../../dialog/pdf-viewer/pdf-viewer.component';
 import { BeSearchComponent } from '../../dialog/be-search/be-search.component';
 import { PdfViewerBeComponent } from '../../dialog/pdf-viewer-be/pdf-viewer-be.component';
 
@@ -55,6 +53,7 @@ export class BeComponent implements OnInit {
     'Avenant',
     'Radiation',
     'Accident de travail et Maladie Professionnel',
+    'Rectif',
   ];
 
   pdfForm!: FormGroup;
@@ -63,16 +62,23 @@ export class BeComponent implements OnInit {
   temp!: string;
   pdfUrl: string | null = null;
   beData: any;
+  numeroReg!: string;
   constructor(
     private fb: FormBuilder,
     private beService: BeService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
+    console.log('be loaded');
     this.initializeForm();
     this.checkBackendConnection();
+  }
+
+  getLastNum() {
+    
   }
 
   private initializeForm(): void {
@@ -173,14 +179,6 @@ export class BeComponent implements OnInit {
   }
 
   exportPdf(): void {
-    if (!this.backendStatus) {
-      this.showSnackBar(
-        'Serveur non accessible. Vérifiez la connexion.',
-        'error'
-      );
-      return;
-    }
-
     if (!this.pdfForm.valid) {
       this.showSnackBar('Veuillez remplir tous les champs requis', 'warning');
       this.markFormGroupTouched();
@@ -216,14 +214,6 @@ export class BeComponent implements OnInit {
   }
 
   showPdf(): void {
-    if (!this.backendStatus) {
-      this.showSnackBar(
-        'Serveur non accessible. Vérifiez la connexion.',
-        'error'
-      );
-      return;
-    }
-
     if (!this.pdfForm.valid) {
       this.showSnackBar('Veuillez remplir tous les champs requis', 'warning');
       this.markFormGroupTouched();
@@ -374,20 +364,13 @@ export class BeComponent implements OnInit {
   }
 
   openBottomSheet() {
-    this.beService.getAllBE().subscribe((response: any) => {
-      this.beData = response.data;
-      console.log(this.beData);
-      this.dialog.open(BeSearchComponent, {
-        minWidth: '70vw',
-        minHeight: '400px',
-        data: {
-          lists: this.beData,
-        },
-      });
+    this.dialog.open(BeSearchComponent, {
+      minWidth: '70vw',
+      minHeight: '400px',
     });
   }
 
-  onCodeInput(index: number): void {
+  /*onCodeInput(index: number): void {
     const group = this.consortsArray.at(index);
     const control = group.get('matricule');
 
@@ -404,16 +387,32 @@ export class BeComponent implements OnInit {
 
       control.setValue(formatted, { emitEvent: false });
     }
+  }*/
+  onCodeInput(index: number): void {
+    const group = this.consortsArray.at(index);
+    const control = group.get('matricule');
+    if (!control) {
+      return;
+    }
+
+    // 1) Nettoyer -> uniquement chiffres
+    let raw = control.value.replace(/\D/g, '').slice(0, 6); // max 6
+    // 2) Afficher joliment -> XXX XXX
+    const formatted = raw.replace(/(\d{3})(\d{0,3})/, '$1 $2').trim();
+    control.setValue(formatted, { emitEvent: false });
+
+    // 3) On ne lance la requête que si on a bien 6 chiffres complets
+    if (raw.length === 6) {
+      this.beService.getNomPs(raw).subscribe({
+        next: (res) => {
+          if (res.data) {
+            group.get('nom')?.setValue(res.data.nom);
+          } else {
+            group.get('nom')?.reset();
+          }
+        },
+        error: () => group.get('nom')?.reset(),
+      });
+    }
   }
 }
-
-//textLong2 = contractuelle *
-//textLong2_1 = fonctionnaire
-//CF => fonctionnaire
-//cf ANE => contractuelle *
-//Fin effectif=>contractuelle *
-//fin solde => fonctionire
-//fin solde Ane=>fonctionnaire
-//MAE ANE=>fonctionnaire
-//MAE => contractuelle *
-//SGG => fonctionnaire

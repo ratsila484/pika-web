@@ -1,0 +1,122 @@
+<div class="container">
+  <div class="header">
+    <h1>🛡️ Administration</h1>
+    <p>Gestion des autorisations clients</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-number">{{ listUsers.length }}</div>
+      <div class="stat-label">Comptes Actifs</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ getPendingCount() }}</div>
+      <div class="stat-label">Compte en attentes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ getPendingCountBe() }}</div>
+      <div class="stat-label">BE en Attente</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ getPendingCountCf() }}</div>
+      <div class="stat-label">Autorisation de sortit en Attente</div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nom du Client</th>
+          <th>Statut Compte</th>
+          <th>Bordereaux</th>
+          <th>Autorisation de Sortie</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of listUsers; track $index) {
+        <tr>
+          <td class="user-name">{{ user.nom }}</td>
+          <td>
+            <div class="permission-controls">
+              <span [class]="user.state_style">
+                <span class="status-icon"></span>
+                {{ user.state }}
+              </span>
+              <div class="permission-buttons">
+                <button
+                  class="btn btn-approve btn-sm"
+                  (click)="approvedStateCpt(user)"
+                >
+                  ✓ Approuver
+                </button>
+                <button
+                  class="btn btn-reject btn-sm"
+                  (click)="rejectStateCpt(user)"
+                >
+                  ✗ Refuser
+                </button>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="permission-controls">
+              <span [class]="user.state_style_be">
+                <span class="status-icon"></span>
+                {{ user.state_be }}
+              </span>
+              <div class="permission-buttons">
+                <button
+                  class="btn btn-approve btn-sm"
+                  (click)="approvedStateBE(user)"
+                >
+                  ✓ Approuver
+                </button>
+                <button
+                  class="btn btn-reject btn-sm"
+                  (click)="rejectStateBE(user)"
+                >
+                  ✗ Refuser
+                </button>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="permission-controls">
+              <span [class]="user.state_style_cf">
+                <span class="status-icon"></span>
+                {{ user.state_cf }}
+              </span>
+              <div class="permission-buttons">
+                <button
+                  class="btn btn-approve btn-sm"
+                  (click)="approvedStateCF(user)"
+                >
+                  ✓ Approuver
+                </button>
+                <button
+                  class="btn btn-reject btn-sm"
+                  (click)="rejectStateCF(user)"
+                >
+                  ✗ Refuser
+                </button>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="actions-cell">
+              <button class="btn btn-save" (click)="saveState(user)">
+                💾 Sauvegarder
+              </button>
+              <button class="btn btn-reset" (click)="clear(user)">
+                🔄 Réinitialiser
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

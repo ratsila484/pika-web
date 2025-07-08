@@ -1,77 +1,4 @@
-<!--<mat-toolbar>
-  <div class="bloc">
-    <div class="left">
-      <div class="logo">
-        <img src="logo2.png" alt="logo" srcset="" class="img-logo" />
-      </div>
-    </div>
-    <div class="mid">
-      <button
-        mat-raised-button
-        color="access"
-        class="example-icon favorite-icon"
-        (click)="accueilPage()"
-        aria-label="Example icon-button with heart icon"
-      >
-        Accueil
-      </button>
-      <button mat-button class="gda" [matMenuTriggerFor]="menu">
-        <span>GDA</span>
-      </button>
-      <mat-menu #menu="matMenu">
-        <button (click)="bePage()" mat-menu-item>
-          <mat-icon>difference</mat-icon>
-          BE
-        </button>
-        <button (click)="psPage()" mat-menu-item>
-          <mat-icon>edit_note</mat-icon>
-          Pour Signature
-        </button>
-        <button (click)="enregPage()" mat-menu-item>
-          <mat-icon>book_4</mat-icon>
-          Enregistrement
-        </button>
-        <button mat-menu-item>
-          <mat-icon>sync_saved_locally</mat-icon>
-          Autorisation de sortie
-        </button>
-      </mat-menu>
-      <button
-        mat-raised-button
-        color="access"
-        class="example-icon"
-        aria-label="Example icon-button with share icon"
-        (click)="archivePage()"
-      >
-        Archives
-      </button>
-      <button
-        mat-raised-button
-        color="access"
-        class="example-icon"
-        aria-label="Example icon-button with share icon"
-      >
-        Mes docs
-      </button>
-      <button
-        mat-raised-button
-        color="access" 
-        class="example-icon"
-        aria-label="Example icon-button with share icon"
-        (click)="statPage()"
-      >
-        Statistiques
-      </button>
-    </div>
-    <div class="right">
-      <button mat-button>
-        <span>Mon compte</span>
-        <mat-icon>person</mat-icon>
-      </button>
-    </div>
-  </div>
-</mat-toolbar>-->
-<mat-toolbar class="modern-toolbar">
+<mat-toolbar class="modern-toolbar" >
   <div class="toolbar-container">
     <!-- Section Logo -->
     <div class="logo-section">
@@ -165,7 +92,7 @@
         aria-label="Mon compte"
       >
         <mat-icon>person</mat-icon>
-        <span>Mon compte</span>
+        <span>{{ identifiant }}</span>
         <mat-icon class="dropdown-icon">keyboard_arrow_down</mat-icon>
       </button>
 
@@ -174,8 +101,15 @@
           <mat-icon>settings</mat-icon>
           <span>Paramètres</span>
         </button>-->
+        @if(user_state == 'admin'){
         <mat-divider></mat-divider>
-        <button mat-menu-item class="menu-item">
+        <button mat-menu-item class="menu-item" (click)="autorisation()">
+          <mat-icon>setting</mat-icon>
+          <span>Autorisations</span>
+        </button>
+        }
+        <mat-divider></mat-divider>
+        <button mat-menu-item class="menu-item" (click)="deconnexion()">
           <mat-icon>logout</mat-icon>
           <span>Déconnexion</span>
         </button>

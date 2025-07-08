@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { dataBe } from '../../models/interfaces';
@@ -15,6 +15,7 @@ export interface BeFormData {
   numero_document?: string;
   date_document?: string;
   transmise?: string;
+  user?: string;
 }
 
 export interface SaveBe {
@@ -40,6 +41,7 @@ export interface SavePs {
   numero_document?: string;
   date_document?: string;
   pdf?: Blob;
+  user?: string;
 }
 
 export interface PsFormData {
@@ -48,9 +50,11 @@ export interface PsFormData {
   consorts: Array<{
     nom: string;
     matricule: string;
+    numeroReg?: string;
   }>;
   numero_document?: string;
   date_document?: string;
+  user?: string;
 }
 
 export interface BeApiRequest {
@@ -64,6 +68,7 @@ export interface BeApiRequest {
     nombres: number;
   }>;
   transmise?: string;
+  user?: string;
 }
 
 export interface PsApiRequest {
@@ -74,7 +79,9 @@ export interface PsApiRequest {
     nom: string;
     numero: string;
     nombres: number;
+    numeroReg?: string;
   }>;
+  user?: string;
 }
 
 export interface RegFormData {
@@ -88,7 +95,9 @@ export interface RegFormData {
     ministere: string;
     pour: string;
     dispatch: string;
+    dateReg?: string;
   }>;
+  user?: string;
 }
 
 export interface SaveReg {
@@ -102,7 +111,9 @@ export interface SaveReg {
     ministere: string;
     pour: string;
     dispatch: string;
+    dateReg?: string;
   }>;
+  user?: string;
 }
 
 export interface RegApiRequest {
@@ -116,7 +127,30 @@ export interface RegApiRequest {
     ministere: string;
     pour: string;
     dispatch: string;
+    dateReg?: string;
   }>;
+  user?: string;
+}
+
+export interface PaginationParams {
+  page: number;
+  limit: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface PaginationResponse {
+  data: any[][];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface User {
+  identifiant: string;
+  password: string;
 }
 
 @Injectable({
@@ -253,13 +287,15 @@ export class BeService {
       transmise: formData.transmise || '',
       template: formData.template || '',
       activite: formData.activite || '',
+      user: formData.user || '',
       numero_document: formData.numero_document || '',
       date_document:
         formData.date_document || new Date().toLocaleDateString('fr-FR'),
       consorts: formData.consorts.map((consort) => ({
         nom: consort.nom.trim(),
         numero: this.cleanMatricule(consort.matricule),
-        nombres: 1, // Valeur par défaut, peut être modifiée selon vos besoins
+        nombres: 1,
+        // Valeur par défaut, peut être modifiée selon vos besoins
       })),
     };
   }
@@ -273,8 +309,10 @@ export class BeService {
       consorts: formData.consorts.map((consort) => ({
         nom: consort.nom.trim(),
         numero: this.cleanMatricule(consort.matricule),
-        nombres: 1, // Valeur par défaut, peut être modifiée selon vos besoins
+        nombres: 1,
+        numeroReg: consort.numeroReg || '', // Valeur par défaut, peut être modifiée selon vos besoins
       })),
+      user: formData.user,
     };
   }
 
@@ -293,6 +331,7 @@ export class BeService {
         ministere: consort.ministere || '',
         pour: consort.pour || '',
         dispatch: consort.dispatch || '',
+        dateReg: consort.dateReg || '',
         // Valeur par défaut, peut être modifiée selon vos besoins
       })),
     };
@@ -419,10 +458,16 @@ export class BeService {
 
     reader.onloadend = () => {
       const base64data = reader.result as string;
-
-      // Ajouter le PDF base64 dans l'objet data
+      const tmp = localStorage.getItem('connected_user'); // Ajouter le PDF base64 dans l'objet data
+      let usertmp = tmp?.split('/');
+      let user = '';
+      if (usertmp) {
+        user = usertmp[1];
+      }
       const fullData = {
         ...data,
+        user: user,
+
         pdf_base64: base64data, // ← champ que tu recevras dans Flask
       };
 
@@ -525,16 +570,74 @@ export class BeService {
     });
   }
 
-  getAllPS() {
-    return this.http.get(this.baseUrl + '/get_ps');
+  getAllPsStat() {
+    return this.http.get(this.baseUrl + '/get_psStat');
   }
 
-  getAllBE() {
+  /*getAllBE(params: { page: number; per_page: number; search: string; }) {
     return this.http.get(this.baseUrl + '/get_be');
+  }*/
+
+  getAllBE(params?: any): Observable<any> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      if (params.page) {
+        httpParams = httpParams.set('page', params.page.toString());
+      }
+      if (params.per_page) {
+        httpParams = httpParams.set('per_page', params.per_page.toString());
+      }
+      if (params.search) {
+        httpParams = httpParams.set('search', params.search);
+      }
+    }
+
+    return this.http.get(`${this.baseUrl}/get_be`, { params: httpParams });
   }
 
-  getAllReg() {
-    return this.http.get(this.baseUrl + '/get_reg');
+  getAllPS(params?: any): Observable<any> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      if (params.page) {
+        httpParams = httpParams.set('page', params.page.toString());
+      }
+      if (params.per_page) {
+        httpParams = httpParams.set('per_page', params.per_page.toString());
+      }
+      if (params.search) {
+        httpParams = httpParams.set('search', params.search);
+      }
+    }
+
+    return this.http.get(`${this.baseUrl}/get_ps`, { params: httpParams });
+  }
+
+  getAllReg(params?: any): Observable<any> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      if (params.page) {
+        httpParams = httpParams.set('page', params.page.toString());
+      }
+      if (params.per_page) {
+        httpParams = httpParams.set('per_page', params.per_page.toString());
+      }
+      if (params.search) {
+        httpParams = httpParams.set('search', params.search);
+      }
+    }
+
+    return this.http.get(`${this.baseUrl}/get_reg`, { params: httpParams });
+  }
+
+  getAllRegStat() {
+    return this.http.get(this.baseUrl + '/get_regStat');
+  }
+
+  getAllBEStat() {
+    return this.http.get(this.baseUrl + '/get_beStat');
   }
 
   //recuperer le fichier pdf deuis back-end
@@ -569,4 +672,82 @@ export class BeService {
       }
     );
   }
+
+  //insertion dans la base de donnee
+  //sign in
+  singIn(data: any) {
+    return this.http.post(this.baseUrl + '/signIn', data);
+  }
+
+  //login
+  logIn(data: any): any {
+    return this.http.post(this.baseUrl + '/logIn', data);
+  }
+
+  getBeDataPaginated(params: PaginationParams): Observable<PaginationResponse> {
+    let httpParams = new HttpParams()
+      .set('page', params.page.toString())
+      .set('limit', params.limit.toString());
+
+    if (params.search && params.search.trim()) {
+      httpParams = httpParams.set('search', params.search.trim());
+    }
+
+    if (params.sortBy) {
+      httpParams = httpParams.set('sortBy', params.sortBy);
+      httpParams = httpParams.set('sortOrder', params.sortOrder || 'asc');
+    }
+
+    return this.http.get<PaginationResponse>(`${this.baseUrl}/be-data`, {
+      params: httpParams,
+    });
+  }
+
+  getPsDataPaginated(params: PaginationParams): Observable<PaginationResponse> {
+    let httpParams = new HttpParams()
+      .set('page', params.page.toString())
+      .set('limit', params.limit.toString());
+
+    if (params.search && params.search.trim()) {
+      httpParams = httpParams.set('search', params.search.trim());
+    }
+
+    if (params.sortBy) {
+      httpParams = httpParams.set('sortBy', params.sortBy);
+      httpParams = httpParams.set('sortOrder', params.sortOrder || 'asc');
+    }
+
+    return this.http.get<PaginationResponse>(`${this.baseUrl}/be-data`, {
+      params: httpParams,
+    });
+  }
+
+  //get list users
+  getListUsers() {
+    return this.http.get(this.baseUrl + '/list_users');
+  }
+
+  //update state users
+  updateState(data: any) {
+    return this.http.post(this.baseUrl + '/update_state', data);
+  }
+
+  //get ps matricule
+  /*getNomPs(matricule: string) {
+    let httpParams = new HttpParams().set('matricule', matricule);
+    return this.http.get(this.baseUrl + '/enregistrement/nom', {
+      params: httpParams,
+    });
+  }*/
+  // get ps matricule
+  getNomPs(matricule: string) {
+    return this.http.get<{ data: { nom: string; numeroreg: string } }>(
+      `${this.baseUrl}/enregistrement/nom`,
+      { params: { matricule } }
+    );
+  }
+
+  /*getLastNumBe(){
+    this.http.get()
+  }*/
 }

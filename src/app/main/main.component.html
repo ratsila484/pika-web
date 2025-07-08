@@ -1,0 +1,22 @@
+<div class="header">
+  <app-header (page)="menuCliked($event)"></app-header>
+</div>
+<div class="main">
+  @if(page == "BE"){
+  <app-be></app-be>
+  }@else if(page == "PS"){
+  <app-pour-signature></app-pour-signature>
+  }@else if (page == "REG") {
+  <app-enregitrement></app-enregitrement>
+  }@else if (page == "archives") {
+  <app-archives></app-archives>
+  }@else if (page == "stat") {
+  <app-statistique></app-statistique>
+  }@else if (page == "accueil") {
+  <app-accueil></app-accueil>
+  }@else if (page == "autorisation") {
+  <app-autorisation></app-autorisation>
+  } @else {
+  <app-accueil></app-accueil>
+  }
+</div>

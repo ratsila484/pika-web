@@ -1,78 +1,119 @@
-<div class="container mt-3">
-  <mat-card class="mat-main-card p-3">
-    <mat-card-header>
-      <div class="d-flex w-100" style="justify-content: space-between">
-        <h2>Archives</h2>
-        <div class="d-flex status-indicator" style="margin-top: 0.5rem">
-          <div class="num">
-            <span>250001</span>
+<div class="main-container">
+  <div class="form-wrapper">
+    <mat-card class="modern-card">
+      <div class="card-header-gradient">
+        <mat-card-header class="modern-header">
+          <div class="header-content">
+            <div class="title-section">
+              <mat-icon class="title-icon">description</mat-icon>
+              <h1 class="main-title">Bordereaux</h1>
+            </div>
+            <div class="status-section">
+              <div class="document-number">
+                <mat-icon>tag</mat-icon>
+                <span class="number">250001</span>
+              </div>
+              <button
+                mat-fab
+                color="accent"
+                
+                class="search-fab"
+                matTooltip="Rechercher un bordereau"
+              >
+                <mat-icon>search</mat-icon>
+              </button>
+            </div>
           </div>
-          <button mat-icon-button class="chip" title="Rechercher un bordereaux">
-            <mat-icon>search</mat-icon>
-          </button>
-          <mat-chip-set>
-            <!--<mat-chip [color]="backendStatus ? 'primary' : 'warn'" selected>
-              <mat-icon>{{
-                backendStatus ? "cloud_done" : "cloud_off"
-              }}</mat-icon>
-            </mat-chip>-->
-          </mat-chip-set>
-        </div>
+        </mat-card-header>
       </div>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="bloc row">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Nom</mat-label>
-            <input matInput placeholder="Ex Jean Dupont" />
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Nom</mat-label>
-            <input matInput placeholder="Ex Jean Dupont" />
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="bloc row">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Nom</mat-label>
-            <input matInput placeholder="Ex Jean Dupont" />
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Nom</mat-label>
-            <input matInput placeholder="Ex Jean Dupont" />
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="bloc row">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Nom</mat-label>
-            <input matInput placeholder="Ex Jean Dupont" />
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Nom</mat-label>
-            <input matInput placeholder="Ex Jean Dupont" />
-          </mat-form-field>
-        </div>
-      </div>
-    </mat-card-content>
-    <div class="footer">
-      <div class="row">
-        <div class="d-flex justify-content-start">
-          <button mat-button>Reset</button>
-        </div>
-        <div class="col-12 d-flex justify-content-center">
-          <button mat-flat-button >Enregistrer</button>
-        </div>
-      </div>
-    </div>
-  </mat-card>
+
+      <form  class="modern-form">
+        <mat-card-content class="form-content">
+          <div class="form-section">
+            <div class="section-header">
+              <mat-icon class="section-icon">settings</mat-icon>
+              <h3 class="section-title">Configuration</h3>
+            </div>
+            <div class="form-row">
+              <!--<div class="form-col">
+                <mat-form-field appearance="outline" class="modern-field">
+                  <mat-label>Template</mat-label>
+                  <mat-select
+                    formControlName="template"
+                    [(value)]="temp"
+                    required
+                  >
+                    @for (option of options; track $index) {
+                    <mat-option [value]="option">
+                      <div class="option-content">
+                        <span>{{ option }}</span>
+                      </div>
+                    </mat-option>
+                    }
+                  </mat-select>
+                  <mat-error *ngIf="templateError">{{
+                    templateError
+                  }}</mat-error>
+                  <mat-hint>Sélectionnez un modèle de document</mat-hint>
+                </mat-form-field>
+              </div>-->
+
+              <!--<div class="form-col">
+                <mat-form-field appearance="outline" class="modern-field">
+                  <mat-label>Activités</mat-label>
+                  <mat-select formControlName="activite" required>
+                    @for (act of activites; track $index) {
+                    <mat-option [value]="act">
+                      <div class="option-content">
+                        <span>{{ act }}</span>
+                      </div>
+                    </mat-option>
+                    }
+                  </mat-select>
+                  <mat-error *ngIf="activiteError">{{
+                    activiteError
+                  }}</mat-error>
+                  <mat-hint>Type d'activité concernée</mat-hint>
+                </mat-form-field>
+              </div>-->
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="section-header">
+              <mat-icon class="section-icon">groups</mat-icon>
+              <h3 class="section-title">Consorts</h3>
+            </div>
+
+            <div class="form-row centered">
+              <div class="form-col-single d-flex justify-content-center">
+                <mat-form-field
+                  appearance="outline"
+                  class="modern-field number-field"
+                >
+                  <mat-label>Nombre de Consort(s)</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    min="1"
+                    max="50"
+                    formControlName="nombreConsorts"
+                    placeholder="Entrez un nombre"
+                  />
+                  <mat-icon matPrefix>group_add</mat-icon>
+                  <mat-hint>Maximum 50 consorts autorisés</mat-hint>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-header">
+              <mat-icon class="section-icon">badge</mat-icon>
+              <h3 class="section-title">Détails des Consorts</h3>
+            </div>
+          </div>
+        </mat-card-content>
+      </form>
+    </mat-card>
+  </div>
 </div>

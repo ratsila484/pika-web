@@ -49,6 +49,13 @@ import { ArchivesComponent } from './components/archives/archives.component';
 import { StatistiqueComponent } from './components/statistique/statistique.component';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import { AccueilComponent } from './components/accueil/accueil.component';
+import { LoginComponent } from './components/login/login.component';
+import { MainComponent } from './main/main.component';
+import { SignInComponent } from './components/sign-in/sign-in.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { AutorisationComponent } from './components/autorisation/autorisation.component';
+import { NotApprovedCptComponent } from './dialog/not-approved-cpt/not-approved-cpt.component';
 
 @NgModule({
   declarations: [
@@ -66,6 +73,11 @@ import { AccueilComponent } from './components/accueil/accueil.component';
     ArchivesComponent,
     StatistiqueComponent,
     AccueilComponent,
+    LoginComponent,
+    MainComponent,
+    SignInComponent,
+    AutorisationComponent,
+    NotApprovedCptComponent,
   ],
   imports: [
     BrowserModule,
@@ -96,7 +108,9 @@ import { AccueilComponent } from './components/accueil/accueil.component';
     MatNativeDateModule,
     MatDialogModule,
     MatTableModule,
-    BaseChartDirective
+    BaseChartDirective,
+    MatPaginatorModule,
+    MatProgressBarModule
   ],
   providers: [provideClientHydration(withEventReplay()), provideCharts(withDefaultRegisterables())],
   bootstrap: [AppComponent],

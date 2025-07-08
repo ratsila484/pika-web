@@ -1,90 +1,32 @@
-<!--<div class="header d-flex">
-  <div class="left">
-    <h4 mat-dialog-title>Enregistrement - Recherche</h4>
-  </div>
-  <div class="right">
-    <mat-form-field appearance="outline">
-      <mat-label>Matricules</mat-label>
-      <input
-        type="text"
-        [(ngModel)]="searchValue"
-        (input)="filterData()"
-        matInput
-        placeholder="Ex 071207"
-      />
-    </mat-form-field>
-  </div>
-</div>
-<mat-dialog-content>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Date de création</th>
-        <th>Nom</th>
-        <th>Matricule</th>
-        <th>Ministère</th>
-        <th>Activité</th>
-        <th>Numero d'enreg</th>
-        <th>Pour</th>
-        <th>Dispach</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (ps of filteredData; track $index) {
-      <tr>
-        <td>{{ formatDate(ps[8]) }}</td>
-        <td>{{ ps[1] }}</td>
-        <td>{{ ps[2] }}</td>
-        <td>{{ ps[3] }}</td>
-        <td>{{ ps[4] }}</td>
-        <td>{{ ps[5] }}</td>
-        <td>{{ ps[7] }}</td>
-        <td>{{ ps[6] }}</td>
-        <td class="dol">
-          <button (click)="download(ps[0])" mat-icon-button>
-            <mat-icon>download</mat-icon>
-          </button>
-        </td>
-      </tr>
-      }@empty {
-      <tr>
-        <td></td>
-        <td>Pas</td>
-        <td>encore</td>
-        <td>de</td>
-        <td>données</td>
-        <td></td>
-      </tr>
-      }
-    </tbody>
-  </table>
-</mat-dialog-content>-->
-
 <div class="search-dialog">
-  <!-- Header moderne avec gradient -->
   <div class="dialog-header">
     <div class="header-content">
       <div class="title-section">
         <mat-icon class="dialog-icon">search</mat-icon>
-        <h2 mat-dialog-title class="dialog-title">Recherche Enregistrement</h2>
+        <div>
+          <h2 mat-dialog-title class="dialog-title">
+            Recherche Enregistrement
+          </h2>
+        </div>
       </div>
       <div class="search-section">
         <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Rechercher par matricule</mat-label>
+          <mat-label>Rechercher matricule ou nom</mat-label>
           <input
             type="text"
             [(ngModel)]="searchValue"
             (input)="filterData()"
             matInput
-            placeholder="Ex: 071-207"
+            placeholder="Ex: 071-207 ou RANDRIA"
             autocomplete="off"
+            [disabled]="isLoading"
           />
           <mat-icon matPrefix>badge</mat-icon>
           <button
             mat-icon-button
             matSuffix
             *ngIf="searchValue"
+            (click)="searchValue = ''; filterData()"
             matTooltip="Effacer la recherche"
           >
             <mat-icon>clear</mat-icon>
@@ -95,49 +37,42 @@
     </div>
   </div>
 
-  <!-- Contenu du dialogue -->
   <mat-dialog-content class="dialog-content">
-    <!-- Statistiques de recherche -->
-    <div class="search-stats" *ngIf="filteredData.length > 0">
-      <div class="stats-card">
-        <mat-icon class="stats-icon">analytics</mat-icon>
-        <span class="stats-text">
-          {{ filteredData.length }} résultat{{
-            filteredData.length > 1 ? "s" : ""
-          }}
-          trouvé{{ filteredData.length > 1 ? "s" : "" }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Table moderne -->
     <div class="table-container">
       <div class="modern-table-wrapper">
-        <table class="modern-table" *ngIf="filteredData.length > 0">
+        <div class="loading-overlay" *ngIf="isLoading">
+          <mat-spinner diameter="40"></mat-spinner>
+          <span>Chargement...</span>
+        </div>
+
+        <table
+          class="modern-table"
+          *ngIf="filteredData.length > 0 && !isLoading"
+        >
           <thead>
             <tr class="table-header">
-              <th class="">
-                <div class="">
+              <th class="th-number">
+                <div class="header-cell">
+                  <mat-icon>numbers</mat-icon>
+                  <span>Num reg</span>
+                </div>
+              </th>
+              <th class="th-date">
+                <div class="header-cell">
                   <mat-icon>calendar_today</mat-icon>
                   <span>Date</span>
                 </div>
               </th>
-              <th class="">
+              <th class="th-name">
                 <div class="header-cell">
                   <mat-icon>person</mat-icon>
                   <span>Nom</span>
                 </div>
               </th>
-              <th class="">
+              <th class="th-matricule">
                 <div class="header-cell">
                   <mat-icon>badge</mat-icon>
                   <span>Matricule</span>
-                </div>
-              </th>
-              <th class="">
-                <div class="header-cell">
-                  <mat-icon>work</mat-icon>
-                  <span>Ministère</span>
                 </div>
               </th>
               <th class="th-activity">
@@ -146,22 +81,10 @@
                   <span>Activité</span>
                 </div>
               </th>
-              <th class="th-number">
-                <div class="header-cell">
-                  <mat-icon>numbers</mat-icon>
-                  <span>Numéro d'enreg</span>
-                </div>
-              </th>
               <th class="th-activity">
                 <div class="header-cell">
-                  <mat-icon>work</mat-icon>
-                  <span>Pour</span>
-                </div>
-              </th>
-              <th class="th-activity">
-                <div class="header-cell">
-                  <mat-icon>work</mat-icon>
-                  <span>Dispatch</span>
+                  <mat-icon>person</mat-icon>
+                  <span>User</span>
                 </div>
               </th>
               <th class="th-actions">
@@ -170,49 +93,40 @@
             </tr>
           </thead>
           <tbody>
-            @for (ps of filteredData; track $index; let i = $index) {
+            @for (ps of filteredData; track ps.id; let i = $index) {
             <tr class="table-row" [class.row-even]="i % 2 === 0">
-              <td class="">
-                <div class="">{{ formatDate(ps[8]) }}</div>
+              <td class="cell-number">
+                <div>{{ ps.numero }}</div>
               </td>
-              <td class="">
+              <td class="cell-date">
                 <div class="date-content">
-                  <span>{{ ps[1] }}</span>
+                  <span>{{ formatDate(ps.date) }}</span>
                 </div>
               </td>
-              <td class="">
+              <td class="cell-name">
+                <div class="name-content">
+                  <span class="name-text">{{ ps.nom }}</span>
+                </div>
+              </td>
+              <td class="cell-matricule">
                 <div class="matricule-chip">
-                  <span class="name-text">{{ ps[2] }}</span>
+                  {{ ps.matricule }}
                 </div>
               </td>
-              <td class="">
-                <div class="">
-                  {{ ps[3] }}
-                </div>
-              </td>
-              <td class="">
+              <td class="cell-activity">
                 <div class="activity-tag">
-                  <span>{{ ps[4] }}</span>
+                  <mat-icon class="activity-icon">business_center</mat-icon>
+                  <span>{{ ps.activite }}</span>
                 </div>
               </td>
-              <td class="">
-                <div class="">
-                  <span>{{ ps[5] }}</span>
-                </div>
-              </td>
-              <td class="">
-                <div class="">
-                  <span>{{ ps[7] }}</span>
-                </div>
-              </td>
-              <td class="">
-                <div class="">
-                  <span>{{ ps[6] }}</span>
+              <td class="cell-activity">
+                <div class="activity-tag">
+                  <span>{{ ps.user }}</span>
                 </div>
               </td>
               <td class="cell-actions">
                 <button
-                  (click)="download(ps[0])"
+                  (click)="download(ps.id)"
                   mat-icon-button
                   class="download-button"
                   matTooltip="Télécharger le document"
@@ -224,35 +138,98 @@
             }
           </tbody>
         </table>
-      </div>
-      <!-- État vide avec design moderne -->
-      <div class="empty-state" *ngIf="filteredData.length === 0">
-        <div class="empty-content">
-          <mat-icon class="empty-icon">search_off</mat-icon>
-          <h3 class="empty-title">Aucun résultat trouvé</h3>
-          <p class="empty-description">
-            {{
-              searchValue
-                ? 'Aucun bordereau ne correspond à votre recherche "' +
-                  searchValue +
-                  '"'
-                : "Aucune donnée disponible pour le moment"
-            }}
-          </p>
-          <button
-            mat-stroked-button
-            color="primary"
-            class="refresh-button"
-            *ngIf="!searchValue"
-          >
-            <mat-icon>refresh</mat-icon>
-            Actualiser
-          </button>
+
+        <!-- État vide -->
+        <div
+          class="empty-state"
+          *ngIf="filteredData.length === 0 && !isLoading"
+        >
+          <div class="empty-content">
+            <mat-icon class="empty-icon">search_off</mat-icon>
+            <h3 class="empty-title">Aucun résultat trouvé</h3>
+            <p class="empty-description">
+              {{
+                searchValue
+                  ? 'Aucun bordereau ne correspond à votre recherche "' +
+                    searchValue +
+                    '"'
+                  : "Aucune donnée disponible pour le moment"
+              }}
+            </p>
+            <button
+              mat-stroked-button
+              color="primary"
+              class="refresh-button"
+              (click)="loadData()"
+              *ngIf="!searchValue"
+            >
+              <mat-icon>refresh</mat-icon>
+              Actualiser
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Actions du dialogue -->
+    <!-- Pagination -->
+    <div class="pagination-container" *ngIf="totalPages > 1 && !isLoading">
+      <div class="pagination-controls">
+        <!-- Première page -->
+        <button
+          mat-icon-button
+          (click)="goToFirstPage()"
+          [disabled]="currentPage === 1"
+          matTooltip="Première page"
+        >
+          <mat-icon>first_page</mat-icon>
+        </button>
+
+        <!-- Page précédente -->
+        <button
+          mat-icon-button
+          (click)="goToPrevPage()"
+          [disabled]="currentPage === 1"
+          matTooltip="Page précédente"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <!-- Numéros de pages -->
+        <div class="page-numbers">
+          @for (page of getPageNumbers(); track page) {
+          <button
+            mat-button
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)"
+            class="page-button"
+          >
+            {{ page }}
+          </button>
+          }
+        </div>
+
+        <!-- Page suivante -->
+        <button
+          mat-icon-button
+          (click)="goToNextPage()"
+          [disabled]="currentPage === totalPages"
+          matTooltip="Page suivante"
+        >
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+
+        <!-- Dernière page -->
+        <button
+          mat-icon-button
+          (click)="goToLastPage()"
+          [disabled]="currentPage === totalPages"
+          matTooltip="Dernière page"
+        >
+          <mat-icon>last_page</mat-icon>
+        </button>
+      </div>
+    </div>
+
     <div class="dialog-actions">
       <button
         mat-stroked-button

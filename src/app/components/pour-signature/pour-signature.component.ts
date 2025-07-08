@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -21,6 +21,7 @@ import {
 import { BeDataComponent } from '../../bottom-sheet/dialog/be-data.component';
 import { PdfViewerComponent } from '../../dialog/pdf-viewer/pdf-viewer.component';
 import { response } from 'express';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-pour-signature',
@@ -46,23 +47,33 @@ export class PourSignatureComponent {
     'Avenant',
     'Radiation',
     'Accident de travail et Maladie Professionnel',
+    'Rectif'
   ];
 
   pdfForm!: FormGroup;
   isLoading = false;
   backendStatus = false;
   psData: any;
-
+  user!: string;
+  numeroReg!: string;
   constructor(
     private fb: FormBuilder,
     private beService: BeService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    @Inject(PLATFORM_ID) private plateformId: Object
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.checkBackendConnection();
+    if (isPlatformBrowser(this.plateformId)) {
+      const tmp = localStorage.getItem('connected_user');
+      if (tmp) {
+        let user_tmp = tmp.split('/');
+        this.user = user_tmp[1];
+      }
+    }
   }
 
   private initializeForm(): void {
@@ -125,6 +136,7 @@ export class PourSignatureComponent {
     return this.fb.group({
       nom: ['', [Validators.required, Validators.minLength(2)]],
       matricule: ['', [Validators.required, this.matriculeValidator]],
+      numeroReg: [''],
     });
   }
 
@@ -140,7 +152,7 @@ export class PourSignatureComponent {
     return null;
   }
 
-  onCodeInput(index: number): void {
+  /*onCodeInput(index: number): void {
     const group = this.consortsArray.at(index);
     const control = group.get('matricule');
 
@@ -156,6 +168,45 @@ export class PourSignatureComponent {
       }
 
       control.setValue(formatted, { emitEvent: false });
+      if (formatted) {
+        this.beService.getNomPs(formatted).subscribe((result: any) => {
+          if (result) {
+            console.log(result.data);
+          }
+        });
+      }
+    }
+  }*/
+  onCodeInput(index: number): void {
+    const group = this.consortsArray.at(index);
+    const control = group.get('matricule');
+    if (!control) {
+      return;
+    }
+
+    // 1) Nettoyer -> uniquement chiffres
+    let raw = control.value.replace(/\D/g, '').slice(0, 6); // max 6
+    // 2) Afficher joliment -> XXX XXX
+    const formatted = raw.replace(/(\d{3})(\d{0,3})/, '$1 $2').trim();
+    control.setValue(formatted, { emitEvent: false });
+
+    // 3) On ne lance la requête que si on a bien 6 chiffres complets
+    if (raw.length === 6) {
+      this.beService.getNomPs(raw).subscribe({
+        next: (res) => {
+          if (res.data) {
+            group.get('nom')?.setValue(res.data.nom);
+            group.get('numeroReg')?.setValue(res.data.numeroreg);
+            console.log(res.data.numeroreg);
+          } else {
+            group.get('nom')?.reset();
+            group.get('numeroReg')?.reset();
+          }
+        },
+        error: () => {
+          group.get('nom')?.reset(), group.get('numeroReg')?.reset();
+        },
+      });
     }
   }
 
@@ -179,49 +230,6 @@ export class PourSignatureComponent {
     return `${year}-${padded}`;
   }
 
-  /*exportPdf(): void {
-    if (!this.backendStatus) {
-      this.showSnackBar(
-        'Serveur non accessible. Vérifiez la connexion.',
-        'error'
-      );
-      return;
-    }
-
-    if (!this.pdfForm.valid) {
-      this.showSnackBar('Veuillez remplir tous les champs requis', 'warning');
-      this.markFormGroupTouched();
-      return;
-    }
-
-    this.isLoading = true;
-
-    const formData: PsFormData = {
-      ...this.pdfForm.value,
-      numero_document: this.generateNumero(),
-      date_document: new Date().toLocaleDateString('fr-FR'),
-    };
-
-    console.log('Données à exporter:', formData);
-
-    this.beService.sendDataPS(formData).subscribe({
-      next: (pdfBlob) => {
-        this.isLoading = false;
-        this.beService.downloadPdfPs(
-          pdfBlob,
-          `bordereau_${formData.numero_document?.replace('-', '_')}.pdf`
-        );
-        this.showSnackBar('PDF généré avec succès', 'success');
-        this.resetForm();
-      },
-      error: (error) => {
-        this.isLoading = false;
-        console.error("Erreur lors de l'export PDF:", error);
-        this.showSnackBar(`Erreur: ${error.message}`, 'error');
-      },
-    });
-  }*/
-
   showPdf(): void {
     if (!this.backendStatus) {
       this.showSnackBar(
@@ -243,6 +251,8 @@ export class PourSignatureComponent {
       ...this.pdfForm.value,
       numero_document: this.generateNumero(),
       date_document: new Date().toLocaleDateString('fr-FR'),
+      user: this.user,
+      numeroReg: this.numeroReg,
     };
 
     const data = formData;
